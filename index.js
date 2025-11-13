@@ -22,7 +22,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     const db = client.db("plateshareDB");
     const foodCollection = db.collection("foods");
@@ -54,7 +54,7 @@ async function run() {
       res.send(result);
     });
 
-    // PATCH: Update food (e.g., food_status)
+    
     app.patch("/foods/:id", async (req, res) => {
       const id = req.params.id;
       const updates = req.body;
@@ -65,29 +65,27 @@ async function run() {
       res.send(result);
     });
 
-    // -------------------- REQUEST ROUTES --------------------
-
-    // POST: Add a new request
+    
     app.post("/requests", async (req, res) => {
       const request = req.body;
 
-      // Get food to attach owner email
+
       const food = await foodCollection.findOne({ _id: new ObjectId(request.foodId) });
       if (!food) return res.status(404).send({ message: "Food not found" });
 
-      request.foodOwnerEmail = food.donorEmail; // donorEmail must exist in food
-      request.status = "pending"; // default status
+      request.foodOwnerEmail = food.donorEmail;
+      request.status = "pending";
       const result = await requestCollection.insertOne(request);
       res.send(result);
     });
 
-    // GET: All requests
+
     app.get("/requests", async (req, res) => {
       const requests = await requestCollection.find().toArray();
       res.send(requests);
     });
 
-    // PATCH: Update request status
+
     app.patch("/requests/:id", async (req, res) => {
       const id = req.params.id;
       const { status } = req.body;
@@ -109,6 +107,4 @@ app.get('/', (req, res) => {
   res.send('Server working fine.');
 });
 
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
-});
+
