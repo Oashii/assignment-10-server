@@ -8,10 +8,10 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection URI
+
 const uri = "mongodb+srv://plateShare:xFqFsFt4S6bdCqAb@cluster0.0ijmspx.mongodb.net/?appName=Cluster0";
 
-// Create client
+
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -28,9 +28,7 @@ async function run() {
     const foodCollection = db.collection("foods");
     const requestCollection = db.collection("requests");
 
-    // -------------------- FOOD ROUTES --------------------
-
-    // POST: Add a new food
+    
     app.post("/foods", async (req, res) => {
       const food = req.body;
       const result = await foodCollection.insertOne(food);
