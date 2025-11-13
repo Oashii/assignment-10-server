@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-
+require('dotenv').config()
 const app = express();
 const port = 3000;
 
@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const uri = "mongodb+srv://plateShare:xFqFsFt4S6bdCqAb@cluster0.0ijmspx.mongodb.net/?appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.0ijmspx.mongodb.net/?appName=Cluster0`;
 
 
 const client = new MongoClient(uri, {
@@ -48,7 +48,6 @@ async function run() {
       res.send(food);
     });
 
-    // DELETE: Remove a food
     app.delete("/foods/:id", async (req, res) => {
       const id = req.params.id;
       const result = await foodCollection.deleteOne({ _id: new ObjectId(id) });
