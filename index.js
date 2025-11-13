@@ -35,13 +35,13 @@ async function run() {
       res.send(result);
     });
 
-    // GET: All foods
+
     app.get("/foods", async (req, res) => {
       const foods = await foodCollection.find().toArray();
       res.send(foods);
     });
 
-    // GET: Single food by ID
+
     app.get("/foods/:id", async (req, res) => {
       const id = req.params.id;
       const food = await foodCollection.findOne({ _id: new ObjectId(id) });
