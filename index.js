@@ -18,20 +18,22 @@ const client = new MongoClient(uri, {
   },
 });
 
-let foodCollection, requestCollection;
+let db = null;
 
-// Connect to MongoDB once
-(async () => {
+// Initialize DB connection
+async function getDB() {
+  if (db) return db;
+  
   try {
     await client.connect();
-    const db = client.db("plateshareDB");
-    foodCollection = db.collection("foods");
-    requestCollection = db.collection("requests");
+    db = client.db("plateshareDB");
     console.log("MongoDB Connected!");
+    return db;
   } catch (err) {
     console.error("MongoDB Connection Error:", err);
+    throw err;
   }
-})();
+}
 
 app.get('/', (req, res) => {
   res.send('Server working fine.');
@@ -39,6 +41,8 @@ app.get('/', (req, res) => {
 
 app.post("/foods", async (req, res) => {
   try {
+    const database = await getDB();
+    const foodCollection = database.collection("foods");
     const food = req.body;
     const result = await foodCollection.insertOne(food);
     res.send(result);
@@ -49,6 +53,8 @@ app.post("/foods", async (req, res) => {
 
 app.get("/foods", async (req, res) => {
   try {
+    const database = await getDB();
+    const foodCollection = database.collection("foods");
     const foods = await foodCollection.find().toArray();
     res.send(foods);
   } catch (err) {
@@ -58,6 +64,8 @@ app.get("/foods", async (req, res) => {
 
 app.get("/foods/:id", async (req, res) => {
   try {
+    const database = await getDB();
+    const foodCollection = database.collection("foods");
     const id = req.params.id;
     const food = await foodCollection.findOne({ _id: new ObjectId(id) });
     res.send(food);
@@ -68,6 +76,8 @@ app.get("/foods/:id", async (req, res) => {
 
 app.delete("/foods/:id", async (req, res) => {
   try {
+    const database = await getDB();
+    const foodCollection = database.collection("foods");
     const id = req.params.id;
     const result = await foodCollection.deleteOne({ _id: new ObjectId(id) });
     res.send(result);
@@ -78,6 +88,8 @@ app.delete("/foods/:id", async (req, res) => {
 
 app.patch("/foods/:id", async (req, res) => {
   try {
+    const database = await getDB();
+    const foodCollection = database.collection("foods");
     const id = req.params.id;
     const updates = req.body;
     const result = await foodCollection.updateOne(
@@ -92,7 +104,11 @@ app.patch("/foods/:id", async (req, res) => {
 
 app.post("/requests", async (req, res) => {
   try {
+    const database = await getDB();
+    const foodCollection = database.collection("foods");
+    const requestCollection = database.collection("requests");
     const request = req.body;
+    
     const food = await foodCollection.findOne({ _id: new ObjectId(request.foodId) });
     if (!food) return res.status(404).send({ message: "Food not found" });
 
@@ -107,6 +123,8 @@ app.post("/requests", async (req, res) => {
 
 app.get("/requests", async (req, res) => {
   try {
+    const database = await getDB();
+    const requestCollection = database.collection("requests");
     const requests = await requestCollection.find().toArray();
     res.send(requests);
   } catch (err) {
@@ -116,6 +134,8 @@ app.get("/requests", async (req, res) => {
 
 app.patch("/requests/:id", async (req, res) => {
   try {
+    const database = await getDB();
+    const requestCollection = database.collection("requests");
     const id = req.params.id;
     const { status } = req.body;
     const result = await requestCollection.updateOne(
