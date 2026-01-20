@@ -3,11 +3,14 @@ const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('Server working fine.');
+});
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.0ijmspx.mongodb.net/?appName=Cluster0`;
 
@@ -103,10 +106,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get('/', (req, res) => {
-  res.send('Server working fine.');
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+  });
+}
 
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
-});
+module.exports = app;
